@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初级汉语语法随堂测试：双宾语句 (4选项多语言版)</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f5f7fb; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #1e3a8a; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        
+        /* 语言选择模块样式 */
+        .lang-selector { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; background: #eef2f6; padding: 15px; border-radius: 8px; margin-bottom: 30px; }
+        .lang-btn { padding: 8px 16px; border: none; background: white; border-radius: 20px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s; }
+        .lang-btn:hover { background: #1e3a8a; color: white; }
+        .lang-btn.active { background: #1e3a8a; color: white; }
+
+        /* 题目样式 */
+        .question-card { background: #fff; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .question-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #2d3748; line-height: 1.6; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn { padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: left; background: #fff; cursor: pointer; transition: all 0.2s; font-size: 1rem; }
+        .option-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+        
+        /* 结果与解析 */
+        .result-box { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; font-size: 0.95rem; line-height: 1.6; white-space: pre-line; }
+        .correct { background-color: #ecfdf5; border: 1px solid #10b981; color: #065f46; }
+        .incorrect { background-color: #fef2f2; border: 1px solid #ef4444; color: #991b1b; }
+        .hint-text { color: #475569; font-style: italic; margin-top: 10px; font-size: 0.9rem; display: block; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📝 初级汉语语法随堂测试 (四选项标准版)</h1>
+    <div class="subtitle">语法项目：双宾语句 (Double Object Construction)</div>
+
+    <!-- 🌟 顶端语言选择模块 🌟 -->
+    <div class="lang-selector">
+        <button class="lang-btn active" onclick="switchLanguage('zh', event)">🇨🇳 汉语 (Default)</button>
+        <button class="lang-btn" onclick="switchLanguage('en', event)">🇺🇸 English</button>
+        <button class="lang-btn" onclick="switchLanguage('th', event)">🇹🇭 ภาษาไทย</button>
+        <button class="lang-btn" onclick="switchLanguage('id', event)">🇮🇩 Bahasa Indonesia</button>
+        <button class="lang-btn" onclick="switchLanguage('fr', event)">🇫🇷 Français</button>
+        <button class="lang-btn" onclick="switchLanguage('ar', event)">🇸🇦 العربية</button>
+    </div>
+
+    <!-- 题目区域 -->
+    <div id="quiz-container"></div>
+</div>
+
+<script>
+// 10道题目，每道题均升级为一模一样的4个标准大纲选项
+const quizData = [
+    {
+        num: 1, words: "教 / 汉语 / 老师 / 我们",
+        translations: { zh: "连词成句：把下面的词语排列成正确的句子。", en: "Word Order: Put the following words in the correct order.", th: "จัดเรียงประโยค: เรียงคำต่อไปนี้ให้เป็นประโยคที่ถูกต้อง", id: "Urutan Kata: Susunlah kata-kata berikut menjadi kalimat yang benar.", fr: "Mettez les mots suivants dans le bon ordre.", ar: "رتب الكلمات التالية لتكوين جملة صحيحة." },
+        options: [
+            { text: "A. 老师教我们汉语。", isCorrect: true, rationale: { zh: "✔️ 正确！动词+人+物。结构完美。", en: "✔️ Correct! Verb + Person + Thing.", th: "✔️ ถูกต้อง! กริยา + คน + สิ่งของ", id: "✔️ Benar! Kata kerja + Orang + Benda.", fr: "✔️ Correct! Verbe + Personne + Chose.", ar: "✔️ صحيح! فعل + شخص + شيء." } },
+            { text: "B. 老师教汉语我们。", isCorrect: false, rationale: { zh: "❌ 错误！不能把事物（汉语）放在人（我们）的前面。", en: "❌ Incorrect! Cannot put the thing before the person.", th: "❌ ผิด! ห้ามเอาสิ่งของไว้ข้างหน้าตัวบุคคล", id: "❌ Salah! Tidak boleh menaruh benda sebelum orang.", fr: "❌ Incorrect! La chose ne peut pas être placée avant la personne.", ar: "❌ خطأ! لا يمكن وضع الشيء قبل الشخص." } },
+            { text: "C. 我们教老师汉语。", isCorrect: false, rationale: { zh: "❌ 逻辑语意错误。通常是老师教学生，而不是学生教老师。", en: "❌ Context Error! Teachers usually teach students.", th: "❌ ผิด逻辑! ปกติครูต้องสอนนักเรียน", id: "❌ Salah Logika! Biasanya guru mengajar murid.", fr: "❌ Erreur de contexte! L'enseignant enseigne aux élèves.", ar: "❌ خطأ في المعنى! المعلم هو من يدرس الطلاب." } },
+            { text: "D. 汉语老师教我们。", isCorrect: false, rationale: { zh: "❌ 结构不完整。这个句子缺少了直接宾语（教什么具体内容）。", en: "❌ Sentence incomplete. It is missing the direct object.", th: "❌ ประโยคไม่สมบูรณ์! ขาดกรรมตรง", id: "❌ Kalimat tidak lengkap! Kekurangan objek langsung.", fr: "❌ Incomplet! Il manque l'objet direct.", ar: "❌ جملة غير مكتملة! يفتقر إلى المفعول به المباشر." } }
+        ],
+        hint: { zh: "提示：动词 + 人 + 东西", en: "Hint: Verb + Person + Thing", th: "คำใบ้: กริยา + คน + สิ่งของ", id: "Petunjuk: Kata kerja + Orang + Benda", fr: "Indice: Verbe + Personne + Chose", ar: "تلميح: فعل + شخص + شيء" }
+    },
+    {
+        num: 2, words: "王老师给_______一本新词典。",
+        translations: { zh: "选择填空。", en: "Fill in the blank.", th: "เติมคำในช่องว่าง", id: "Isilah titik-titik di bawah ini.", fr: "Remplissez le blanc.", ar: "ملء الفراغ." },
+        options: [
+            { text: "A. 学生", isCorrect: true, rationale: { zh: "✔️ 正确！“给”后面要紧跟动作的接受者（人）。“学生”符合要求。", en: "✔️ Correct! '给' must be followed immediately by the recipient (Person).", th: "✔️ ถูกต้อง! หลังคำว่า '给' ต้องตามด้วยผู้รับที่เป็น (คน) ทันที", id: "✔️ Benar! Setelah '给', harus langsung diikuti oleh penerima (Orang).", fr: "✔️ Correct! '给' doit être suivi du destinataire (Personne).", ar: "✔️ صحيح! '给' يجب أن يتبعها المتلقي (الشخص) مباشرة." } },
+            { text: "B. 买", isCorrect: false, rationale: { zh: "❌ 错误！“买”是动词，无法在这里作接受东西的宾语。", en: "❌ Incorrect! '买' is a verb and cannot fill the recipient slot.", th: "❌ ผิด! '买' เป็นคำกริยา ไม่สามารถทำหน้าที่ตรงนี้ได้", id: "❌ Salah! '买' adalah kata kerja, tidak bisa menjadi objek.", fr: "❌ Incorrect! '买' est un verbe et ne peut pas être l'objet.", ar: "❌ خطأ! '买' فعل ولا يمكن أن يكون مفعولاً به هنا." } },
+            { text: "C. 学校", isCorrect: false, rationale: { zh: "❌ 错误！“学校”是场所，后面已有具体的书，这里需要具体指代人际间赠送的对象。", en: "❌ Incorrect! 'School' is a place, we need a specific person here.", th: "❌ ผิด! ห้องสมุดหรือโรงเรียนเป็นสถานที่ ตรงนี้ขาดตัวบุคคล", id: "❌ Salah! 'Sekolah' adalah tempat, kita butuh orang di sini.", fr: "❌ Incorrect! 'École' est un lieu, nous avons besoin d'une personne.", ar: "❌ خطأ! 'المدرسة' مكان، نحن بحاجة إلى شخص هنا." } },
+            { text: "D. 英文", isCorrect: false, rationale: { zh: "❌ 错误！“英文”是事物，句尾已经有直接宾语了，不能再加一个事物。", en: "❌ Incorrect! 'English' is a thing. The direct object is already present.", th: "❌ ผิด! '英文' เป็นสิ่งของ/ภาษา ซึ่งข้างหลังมีสิ่งของอยู่แล้ว", id: "❌ Salah! 'English' adalah benda. Objek langsung sudah ada.", fr: "❌ Incorrect! L'objet direct est déjà présent.", ar: "❌ خطأ! 'اللغة الإنجليزية' شيء والمفعول به المباشر موجود بالفعل." } }
+        ],
+        hint: { zh: "提示：寻找代表“人”的词汇。", en: "Hint: Find the word that represents a 'Person'.", th: "คำใบ้: ค้นหาคำที่เป็น 'คน'", id: "Petunjuk: Cari kata yang menunjukkan 'Orang'.", fr: "Indice: Trouvez le mot qui représente une 'Personne'.", ar: "تلميح: ابحث عن الكلمة التي تمثل 'شخصاً'." }
+    },
+    {
+        num: 3, words: "找 / 营业员 / 五块钱 / 我",
+        translations: { zh: "连词成句（买东西找钱场景）。", en: "Word Order (Shopping scenario).", th: "จัดเรียงประโยค (สถานการณ์ซื้อของทอนเงิน)", id: "Urutan Kata (Skenario berbelanja).", fr: "Ordre des mots (Scénario d'achat).", ar: "ترتيب الكلمات (سيناريو التسوق)." },
+        options: [
+            { text: "A. 营业员找我五块钱。", isCorrect: true, rationale: { zh: "✔️ 正确！主语（营业员）+ 动词（找）+ 人（我）+ 钱（五块钱）。", en: "✔️ Correct! Subject (Clerk) + Action (找) + Person (Me) + Money.", th: "✔️ ถูกต้อง! ประธาน (พนักงาน) + กริยา (ทอนเงิน) + คน (ฉัน) + จำนวนเงิน", id: "✔️ Benar! Subjek (Pelayan) + 找 + Orang (Saya) + Uang.", fr: "✔️ Correct! Sujet (Vendeur) + 找 + Personne (Moi) + Argent.", ar: "✔️ صحيح! الفاعل + 找 + الشخص + المال." } },
+            { text: "B. 我找营业员五块钱。", isCorrect: false, rationale: { zh: "❌ 错误！逻辑颠倒，这意味着顾客给营业员找钱，不符合常理。", en: "❌ Incorrect! This implies the customer is giving change to the clerk.", th: "❌ ผิด! แปลว่า 'ฉันทอนเงินให้พนักงาน' ซึ่งสลับหน้าที่กัน", id: "❌ Salah! Ini berarti pelanggan yang memberikan kembalian kepada pelayan.", fr: "❌ Incorrect! Cela signifie que le client rend de la monnaie au vendeur.", ar: "❌ خطأ! هذا يعني أن الزبون هو من يعيد الباقي للبائع." } },
+            { text: "C. 营业员找五块钱我。", isCorrect: false, rationale: { zh: "❌ 错误！违背了先人后钱的规则，钱不能放在人的前面。", en: "❌ Incorrect! Money cannot come before the person.", th: "❌ ผิดไวยากรณ์! ห้ามเอาจำนวนเงินไว้หน้าตัวบุคคล", id: "❌ Salah! Uang tidak boleh mendahului orang.", fr: "❌ Incorrect! L'argent ne peut pas être placé avant la personne.", ar: "❌ خطأ! لا يمكن وضع المال قبل الشخص." } },
+            { text: "D. 五块钱找我营业员。", isCorrect: false, rationale: { zh: "❌ 错误！语序完全崩溃，不符合汉语句子基本结构。", en: "❌ Incorrect! Word order is completely scrambled.", th: "❌ ผิดรุนแรง! ลำดับประโยคเสียหายทั้งหมด", id: "❌ Salah total! Urutan kalimat hancur.", fr: "❌ Incorrect! Structure complètement détruite.", ar: "❌ خطأ! ترتيب الكلمات غير صحيح تماماً." } }
+        ],
+        hint: { zh: "提示：谁给谁找钱？主语 + 找 + 人 + 钱。", en: "Hint: Who gives change to whom? Subject + 找 + Person + Money.", th: "คำใบ้: ใครทอนเงินให้ใคร? ประธาน + 找 + คน + เงิน", id: "Petunjuk: Siapa memberi kembalian? Subjek + 找 + Orang + Uang.", fr: "Indice: Qui rend la monnaie? Sujet + 找 + Personne + Argent.", ar: "تلميح: من يعيد الباقي لمن؟ الفاعل + 找 + الشخص + المال." }
+    },
+    {
+        num: 4, words: "选择正确的句子。",
+        translations: { zh: "选择正确的句子。", en: "Select the correct sentence.", th: "เลือกประโยคที่ถูกต้อง", id: "Pilihlah kalimat yang benar.", fr: "Sélectionnez la phrase correcte.", ar: "اختر الجملة الصحيحة." },
+        options: [
+            { text: "A. 我问老师一个问题。", isCorrect: true, rationale: { zh: "✔️ 正确！动词“问” + 人（老师） + 物（一个问题）。", en: "✔️ Correct! Verb '问' + Person + Thing.", th: "✔️ ถูกต้อง! กริยา '问' + คน + สิ่งของ", id: "✔️ Benar! Kata kerja '问' + Orang + Benda.", fr: "✔️ Correct! Verbe '问' + Personne + Chose.", ar: "✔️ صحيح! الفعل '问' + الشخص + الشيء." } },
+            { text: "B. 我问一个问题老师。", isCorrect: false, rationale: { zh: "❌ 错误！不能把问题（事物）放在老师（人）的前面。", en: "❌ Incorrect! You cannot put the thing before the person.", th: "❌ ผิด! ห้ามเอา 'คำถาม' ขึ้นก่อน 'ตัวบุคคล'", id: "❌ Salah! Benda tidak boleh mendahului orang.", fr: "❌ Incorrect! La chose ne peut pas précéder la personne.", ar: "❌ خطأ! لا يمكن وضع الشيء قبل الشخص." } },
+            { text: "C. 老师问我一个问题不。", isCorrect: false, rationale: { zh: "❌ 错误！普通疑问句句尾不直接加“不”，应使用“吗”。", en: "❌ Incorrect particle! Use '吗' for questions instead of '不'.", th: "❌ ผิด! ท้ายประโยคคำถามทั่วไปต้องใช้ '吗' ไม่ใช่ '不'", id: "❌ Salah! Akhir kalimat tanya harus menggunakan '吗' bukan '不'.", fr: "❌ Incorrect! Utilisez '吗' pour les questions au lieu de '不'.", ar: "❌ خطأ! يجب استخدام '吗' للسؤال بدلاً من '不'." } },
+            { text: "D. 一个问题问老师我。", isCorrect: false, rationale: { zh: "❌ 错误！语序颠倒，主语和宾语位置完全混乱。", en: "❌ Incorrect! The syntax has completely broken down.", th: "❌ ผิด! ลำดับคำสลับซับซ้อนและผิดไวยากรณ์", id: "❌ Salah! Struktur kalimat benar-benar keliru.", fr: "❌ Incorrect! La syntaxe est complètement erronée.", ar: "❌ خطأ! ترتيب الكلمات غير صحيح تماماً." } }
+        ],
+        hint: { zh: "提示：问 + 谁 + 什么", en: "Hint: Ask (问) + Who + What", th: "คำใบ้: 问 + ใคร + อะไร", id: "Petunjuk: 问 + Siapa + Apa", fr: "Indice: 问 + Qui + Quoi", ar: "تلميح: 问 + من + ماذا" }
+    },
+    {
+        num: 5, words: "我常常借_______一本中文杂志。",
+        translations: { zh: "选择填空。", en: "Fill in the blank.", th: "เติมคำในช่องว่าง", id: "Isilah titik-titik di bawah ini.", fr: "Remplissez le blanc.", ar: "ملء الفราغ." },
+        options: [
+            { text: "A. 同屋", isCorrect: true, rationale: { zh: "✔️ 正确！“同屋”是人，作间接宾语，完美符合格式。", en: "✔️ Correct! '同屋' (roommate) is a person, fitting perfectly.", th: "✔️ ถูกต้อง! '同屋' (รูมเมท) เป็นบุคคล เข้ากับโครงสร้างได้ถูกต้อง", id: "✔️ Benar! '同屋' adalah orang, sangat cocok di posisi ini.", fr: "✔️ Correct! '同屋' (colocataire) est une personne, convient parfaitement.", ar: "✔️ صحيح! '同屋' هو شخص، يناسب تماماً." } },
+            { text: "B. 图书馆", isCorrect: false, rationale: { zh: "❌ 错误！重点易错点。如果是从图书馆借，必须说“从图书馆借”，不能说“借图书馆书”。", en: "❌ Incorrect! If from a library, you must use '从图书馆借'. Places cannot be indirect objects directly.", th: "❌ ผิดบ่อย! ถ้าเป็นสถานที่ต้องใช้ '从图书馆借' ไม่สามารถต่อท้าย 借 ได้โดยตรง", id: "❌ Salah! Jika dari perpustakaan, harus menggunakan '从图书馆借'. Tempat tidak bisa langsung ditempel.", fr: "❌ Incorrect! Pour un lieu, il faut dire '从图书馆借'.", ar: "❌ خطأ! إذا كان من المكتبة، يجب قول '从图书馆借'. الأماكن لا تكون مفعولاً به مباشرة." } },
+            { text: "C. 看", isCorrect: false, rationale: { zh: "❌ 错误！“看”是动词，会导致语法功能冲突。", en: "❌ Incorrect! '看' is a verb and cannot fill this noun slot.", th: "❌ ผิด! '看' เป็นคำกริยา ไม่สามารถเติมตรงนี้ได้", id: "❌ Salah! '看' adalah kata kerja, tidak bisa mengisi posisi ini.", fr: "❌ Incorrect! '看' est un verbe et ne convient pas ici.", ar: "❌ خطأ! '看' فعل ولا يمكنه ملء هذا الفراغ." } },
+            { text: "D. 去", isCorrect: false, rationale: { zh: "❌ 错误！“去”是动词，不符合双宾语中“人”的位置要求。", en: "❌ Incorrect! '去' is a verb and doesn't fit the 'Person' slot.", th: "❌ ผิด! '去' เป็นกริยา ไม่สามารถใช้รองรับการยืมได้", id: "❌ Salah! '去' tidak cocok untuk posisi orang.", fr: "❌ Incorrect! '去' ne convient pas pour la place de la personne.", ar: "❌ خطأ! '去' فعل ولا يناسب خانة الشخص." } }
+        ],
+        hint: { zh: "提示：这里需要一个代表“人”的词汇，不能用场所或动词。", en: "Hint: You need a word that represents a 'Person', not a place or verb.", th: "คำใบ้: ต้องเลือกคำที่เป็น 'บุคคล' ไม่ใช่สถานที่หรือกริยา", id: "Petunjuk: Anda memerlukan kata yang menunjukkan 'Orang'.", fr: "Indice: Vous avez besoin d'un mot qui représente une 'Personne'.", ar: "تلميح: أنت بحاجة إلى كلمة تمثل 'شخصاً'." }
+    },
+    {
+        num: 6, words: "还 / 我 / 他 / 美元 / 一百",
+        translations: { zh: "连词成句：关于换钱和还钱。", en: "Word Order: Regarding returning money.", th: "จัดเรียงประโยค: เกี่ยวกับการคืนเงิน", id: "Urutan Kata: Tentang mengembalikan uang.", fr: "Ordre des mots: Pour rendre de l'argent.", ar: "ترتيب الكلمات: بخصوص إعادة المال." },
+        options: [
+            { text: "A. 我还他一百美元。", isCorrect: true, rationale: { zh: "✔️ 正确！动词（还）+ 人（他）+ 钱（一百美元）。", en: "✔️ Correct! Verb (还) + Person (他) + Money (一百美元).", th: "✔️ ถูกต้อง! กริยา (还) + คน (他) + เงิน", id: "✔️ Benar! Kata kerja (还) + Orang (他) + Uang.", fr: "✔️ Correct! Verbe (还) + Personne (他) + Argent.", ar: "✔️ صحيح! الفعل (还) + الشخص (他) + المال." } },
+            { text: "B. 我还一百美元他。", isCorrect: false, rationale: { zh: "❌ 错误！“一百美元”是直接宾语，不能放在人（他）的前面。", en: "❌ Incorrect! Money cannot come before the person.", th: "❌ ผิด! เอาสิ่งของไว้ข้างหน้าคนไม่ได้", id: "❌ Salah! Uang tidak boleh mendahului orang.", fr: "❌ Incorrect! L'argent ne peut pas précéder la personne.", ar: "❌ خطأ! لا يمكن وضع المال قبل الشخص." } },
+            { text: "C. 他还一百美元我。", isCorrect: false, rationale: { zh: "❌ 错误！不仅主语更换了，且依然违反了先人后物的规律。", en: "❌ Incorrect order and meaning.", th: "❌ ผิด! ลำดับคำและประธานผิดเพี้ยน", id: "❌ Salah! Urutan dan subjek salah.", fr: "❌ Incorrect! L'ordre et le sujet sont faux.", ar: "❌ خطأ! الترتيب والفاعل خاطئان." } },
+            { text: "D. 美元一百我还他。", isCorrect: false, rationale: { zh: "❌ 错误！数量词“一百”应在名词“美元”前，且整体语序完全颠倒。", en: "❌ Incorrect! The number must come before the currency.", th: "❌ ผิดรุนแรง! ตัวเลขต้องอยู่หน้าหน่วยเงินและลำดับสับสน", id: "❌ Salah! Angka harus berada sebelum mata uang.", fr: "❌ Incorrect! Le nombre doit précéder la monnaie.", ar: "❌ خطأ! يجب أن يأتي الرقم قبل العملة." } }
+        ],
+        hint: { zh: "提示：还 + 谁 + 多少钱", en: "Hint: Return (还) + Who + How much", th: "คำใบ้: 还 + ใคร + เงินเท่าไหร่", id: "Petunjuk: 还 + Siapa + Berapa banyak", fr: "Indice: 还 + Qui + Combien", ar: "تلميح: 还 + من + كم من المال" }
+    },
+    {
+        num: 7, words: "选择正确的句子。",
+        translations: { zh: "选择正确的句子。", en: "Select the correct sentence.", th: "เลือกประโยคที่ถูกต้อง", id: "Pilihlah kalimat yang benar.", fr: "Sélectionnez la phrase correcte.", ar: "اختر الجملة الصحيحة." },
+        options: [
+            { text: "A. 留学生问秘书办公室的号码。", isCorrect: true, rationale: { zh: "✔️ 正确！动词“问”完美连接了人（秘书）和事物（号码）。", en: "✔️ Correct! '问' properly connects the person and the thing.", th: "✔️ ถูกต้อง! '问' เชื่อมต่อคนและข้อมูลได้อย่างถูกต้อง", id: "✔️ Benar! '问' menghubungkan orang dan benda dengan benar.", fr: "✔️ Correct! '问' connecte correctement la personne et la chose.", ar: "✔️ صحيح! '问' يربط بشكل صحيح بين الشخص والشيء." } },
+            { text: "B. 留学生问办公室的号码秘书。", isCorrect: false, rationale: { zh: "❌ 错误！语序颠倒，将询问的内容（事物）放在了人的前面。", en: "❌ Incorrect! Put the thing before the person.", th: "❌ ผิด! เอาข้อมูล/สิ่งของไว้ข้างหน้าตัวบุคคล", id: "❌ Salah! Menaruh benda sebelum orang.", fr: "❌ Incorrect! La chose est placée avant la personne.", ar: "❌ خطأ! وضع الشيء قبل الشخص." } },
+            { text: "C. 留学生给秘书问办公室号码。", isCorrect: false, rationale: { zh: "❌ 错误！“问”本身就能带双宾语，不需要加介词“给”。", en: "❌ Incorrect! '问' takes double objects directly; no need for '给'.", th: "❌ ผิด! '问' ไม่ต้องใช้介词 '给' มาช่วยนำทวน", id: "❌ Salah! '问' bisa langsung mengambil objek; tidak perlu '给'.", fr: "❌ Incorrect! '问' prend deux objets directement; pas besoin de '给'.", ar: "❌ خطأ! '问' يأخذ مفعولين مباشرة؛ لا حاجة لـ '给'." } },
+            { text: "D. 秘书问留学生办公室的号码吗？", isCorrect: false, rationale: { zh: "❌ 逻辑颠倒。常理中是留学生去向秘书打听办事处号码，而不是秘书问留学生。", en: "❌ Logic Error! The secretary usually knows the number.", th: "❌ ผิดตรรกะ! ปกติเลขานุการต้องเป็นฝ่ายรู้เบอร์", id: "❌ Salah Logika! Sekretaris biasanya tahu nomornya.", fr: "❌ Erreur de logique! Le secrétaire connaît généralement le numéro.", ar: "❌ خطأ في المنطق! السكرتير عادة يعرف الرقم." } }
+        ],
+        hint: { zh: "提示：“问”字句是不需要“给”来引出的，直接接人。", en: "Hint: '问' does not need '给' to introduce the person.", th: "คำใบ้: '问' ไม่ต้องใช้ '给' นำหน้าคน", id: "Petunjuk: '问' tidak memerlukan '给' sebelum orang.", fr: "Indice: '问' n'a pas besoin de '给' devant la personne.", ar: "تلميح: '问' لا يحتاج إلى '给' قبل الشخص." }
+    },
+    {
+        num: 8, words: "秘书 / 给 / 介绍 / 各位教授 / 留学生",
+        translations: { zh: "【⚠️对比干扰题】连词成句。", en: "【⚠️ Contrast 】Word Order.", th: "【⚠️ ข้อควรระวัง】จัดเรียงประโยค", id: "【⚠️ Kontras】Urutan Kata.", fr: "【⚠️ Contraste】Ordre des mots.", ar: "【⚠️ مقارنة】ترتيب الكلمات." },
+        options: [
+            { text: "A. 秘书给各位教授介绍留学生。", isCorrect: true, rationale: { zh: "✔️ 正确！注意：“介绍”不能直接带双宾语，必须用“给...介绍...”结构。", en: "✔️ Correct! '介绍' is NOT a double-object verb. It needs '给'.", th: "✔️ ถูกต้อง! '介绍' ไม่ใช่กริยากรรมสองตัว ต้องใช้โครงสร้าง '给...介绍...'", id: "✔️ Benar! '介绍' BUKAN kata kerja objek ganda. Perlu '给'.", fr: "✔️ Correct! '介绍' n'est PAS un verbe à double objet. Il a besoin de '给'.", ar: "✔️ صحيح! '介绍' ليس فعلاً يأخذ مفعولين. يحتاج إلى '给'." } },
+            { text: "B. 秘书介绍各位教授留学生。", isCorrect: false, rationale: { zh: "❌ 错误！不能直接像“教”那样放两个宾语，必须借助介词。", en: "❌ Incorrect! '介绍' cannot take two objects directly.", th: "❌ ผิด! '介绍' ไม่สามารถต่อด้วยกรรมสองตัวได้โดยตรง", id: "❌ Salah! '介绍' tidak bisa langsung mengambil dua objek.", fr: "❌ Incorrect! '介绍' ne peut pas prendre deux objets directement.", ar: "❌ خطأ! '介绍' لا يمكنه أخذ مفعولين مباشرة." } },
+            { text: "C. 秘书介绍留学生各位教授。", isCorrect: false, rationale: { zh: "❌ 错误！同样犯了“介绍”直接加双宾语的语法错误。", en: "❌ Incorrect grammar for the verb '介绍'.", th: "❌ ผิดไวยากรณ์เหมือนกัน! ขาดการเชื่อมโยง", id: "❌ Salah tata bahasa! Kekurangan kata depan.", fr: "❌ Mauvaise grammaire pour le verbe '介绍'.", ar: "❌ خطأ في القواعد بالنسبة للفعل '介绍'." } },
+            { text: "D. 各位教授介绍秘书留学生。", isCorrect: false, rationale: { zh: "❌ 错误！角色混乱且语法完全不对。", en: "❌ Incorrect roles and wrong grammar.", th: "❌ ผิดทั้งหมด! ทั้งบทบาทและไวยากรณ์สับสน", id: "❌ Salah total! Peran dan tata bahasa keliru.", fr: "❌ Faux! Les rôles et la grammaire sont incorrects.", ar: "❌ خطأ! الأدوار والقواعد غير صحيحة." } }
+        ],
+        hint: { zh: "提示：“介绍”不是双宾语动词，要用“给某人介绍”。", en: "Hint: '介绍' requires '给' to introduce the target.", th: "คำใบ้: '介绍' ต้องใช้ '给' นำหน้าผู้รับฟัง", id: "Petunjuk: '介绍' memerlukan '给' sebelum orang.", fr: "Indice: '介绍' nécessite '给' devant la personne.", ar: "تلميح: '介绍' تتطلب '给' قبل الشخص." }
+    },
+    {
+        num: 9, words: "我同屋想教_______英语，我想教他汉语。",
+        translations: { zh: "选择填空。", en: "Fill in the blank.", th: "เติมคำในช่องว่าง", id: "Isilah titik-titik.", fr: "Remplissez le blanc.", ar: "ملء الفراغ." },
+        options: [
+            { text: "A. 我", isCorrect: true, rationale: { zh: "✔️ 正确！后半句是“我教他”，前半句必然对应“他教我”，符合互相学习的逻辑。", en: "✔️ Correct! Fits the logical context of mutual learning.", th: "✔️ ถูกต้อง! สอดคล้องกับตรรกะการแลกเปลี่ยนเรียนรู้ซึ่งกันและกัน", id: "✔️ Benar! Sesuai dengan logika konteks saling belajar.", fr: "✔️ Correct! Correspond à la logique d'apprentissage mutuel.", ar: "✔️ صحيح! يناسب سياق التعلم المتبادل." } },
+            { text: "B. 他", isCorrect: false, rationale: { zh: "❌ 错误！若填“他”，变成室友教他自己，前后语意完全不连贯。", en: "❌ Incorrect! This would mean the roommate teaches himself.", th: "❌ ผิด! จะแปลว่ารูมเมทสอนตัวเอง ซึ่งไม่ต่อเนื่องกับประโยคหลัง", id: "❌ Salah! Ini berarti teman sekamar mengajar dirinya sendiri.", fr: "❌ Incorrect! Cela signifierait que le colocataire s'enseigne à lui-même.", ar: "❌ خطأ! هذا يعني أن زميل السكن يدرس نفسه." } },
+            { text: "C. 什么", isCorrect: false, rationale: { zh: "❌ 错误！后面已经有“英语”这一具体学科，不需要用疑问代词占位。", en: "❌ Incorrect! 'English' is already specified; '什么' is redundant.", th: "❌ ผิด! มีคำว่า '英语' อยู่แล้ว ไม่ต้องใช้คำถาม '什么' อีก", id: "❌ Salah! 'English' sudah ditentukan, tidak perlu kata tanya.", fr: "❌ Incorrect! 'English' est déjà spécifié.", ar: "❌ خطأ! '英语' محددة بالفعل؛ لا حاجة لاسم الاستفهام." } },
+            { text: "D. 谁", isCorrect: false, rationale: { zh: "❌ 错误！这是一句清晰的陈述句，不需要使用疑问代词“谁”。", en: "❌ Incorrect! This is a declarative sentence, no need for '谁'.", th: "❌ ผิด! นี่เป็นประโยคบอกเล่า ไม่ต้องใช้คำสรรพนามคำถาม '谁'", id: "❌ Salah! Ini kalimat pernyataan, tidak perlu kata tanya.", fr: "❌ Incorrect! C'est une phrase déclarative, pas de '谁'.", ar: "❌ خطأ! هذه جملة خبرية، لا حاجة لاسم الاستفهام." } }
+        ],
+        hint: { zh: "提示：注意前后句中动作的主动和被动对应关系。", en: "Hint: Pay attention to the mutual relationship between the clauses.", th: "คำใบ้: สังเกตความสัมพันธ์ที่สอดคล้องกันระหว่างสองประโยค", id: "Petunjuk: Perhatikan hubungan timbal balik antar klausa.", fr: "Indice: Faites attention à la relation entre les deux propositions.", ar: "تلميح: انتبه إلى العلاقة المتبادلة بين الجملتين." }
+    },
+    {
+        num: 10, words: "送 / 朋友 / 我 / 一张 / 照片",
+        translations: { zh: "连词成句：朋友送礼物场景。", en: "Word Order: Friend giving a gift.", th: "จัดเรียงประโยค: สถานการณ์เพื่อนมอบของขวัญ", id: "Urutan Kata: Skenario teman memberi hadiah.", fr: "Ordre des mots: Un ami offre un cadeau.", ar: "ترتيب الكلمات: سيناريو تقديم صديق لهدية." },
+        options: [
+            { text: "A. 朋友送我一张照片。", isCorrect: true, rationale: { zh: "✔️ 正确！动词（送）+ 人（我）+ 物（一张照片），完美语序。", en: "✔️ Correct! Verb (送) + Person (我) + Thing (一张照片). Perfect.", th: "✔️ ถูกต้อง! กริยา (送) + คน (我) + สิ่งของ สมบูรณ์แบบ", id: "✔️ Benar! Kata kerja (送) + Orang (我) + Benda. Sempurna.", fr: "✔️ Correct! Verbe (送) + Personne (我) + Chose. Parfait.", ar: "✔️ صحيح! الفعل (送) + الشخص (我) + الشيء. مثالي." } },
+            { text: "B. 朋友送一张照片我。", isCorrect: false, rationale: { zh: "❌ 错误！照片（事物）不能放在人（我）的前面。", en: "❌ Incorrect! The thing (photo) cannot come before the person (me).", th: "❌ ผิด! ห้ามเอาสิ่งของไว้ข้างหน้าตัวบุคคลเด็ดขาด", id: "❌ Salah! Benda tidak boleh ditaruh sebelum orang.", fr: "❌ Incorrect! La chose ne peut pas précéder la personne.", ar: "❌ خطأ! لا يمكن وضع الشيء قبل الشخص." } },
+            { text: "C. 我送一张照片朋友。", isCorrect: false, rationale: { zh: "❌ 错误！即使主语换了，也犯了“事物在人前面”的语序错误。", en: "❌ Incorrect! Even if the subject changes, the order is wrong.", th: "❌ ผิด! ถึงแม้จะเปลี่ยนประธาน ลำดับคำก็ยังผิดอยู่ดี", id: "❌ Salah! Meskipun subjek diubah, urutan kata tetap keliru.", fr: "❌ Incorrect! Même si le sujet change, l'ordre est faux.", ar: "❌ خطأ! حتى لو تغير الفاعل، فإن ترتيب الكلمات لا يزال خاطئاً." } },
+            { text: "D. 一张照片送我朋友。", isCorrect: false, rationale: { zh: "❌ 错误！主语变成了照片，语义彻底不通。", en: "❌ Incorrect! The subject becomes the photo, making no sense.", th: "❌ ผิด! ประธานกลายเป็นรูปภาพ ทำให้ความหมายไม่เป็นไปตามความจริง", id: "❌ Salah! Subjeknya menjadi foto, maknanya tidak logis.", fr: "❌ Incorrect! Le sujet devient la photo, ce qui n'a aucun sens.", ar: "❌ خطأ! أصبح الفاعل هو الصورة، مما جعل المعنى غير منطقي." } }
+        ],
+        hint: { zh: "提示：送 + 谁 + 什么东西", en: "Hint: Gift (送) + Who + What thing", th: "คำใบ้: 送 + ใคร + สิ่งของอะไร", id: "Petunjuk: 送 + Siapa + Benda apa", fr: "Indice: 送 + Qui + Quelle chose", ar: "تلميح: 送 + من + أي شيء" }
+    }
+];
+
+let currentLang = 'zh';
+
+function renderQuiz() {
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = '';
+
+    quizData.forEach((q, qIdx) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.innerHTML = `
+            <div class="question-title">
+                <strong>第 ${q.num} 题：</strong>${q.words} <br>
+                <small style="color:#555; font-weight:normal; display:block; margin-top:5px;">💡 ${q.translations[currentLang]}</small>
+            </div>
+            <div class="options" id="options-${qIdx}"></div>
+            <div class="result-box" id="result-${qIdx}"></div>
+            <span class="hint-text" id="hint-${qIdx}">📌 ${q.hint[currentLang]}</span>
+        `;
+        container.appendChild(card);
+
+        const optionsContainer = document.getElementById(`options-${qIdx}`);
+        q.options.forEach((opt, oIdx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => checkAnswer(qIdx, oIdx);
+            optionsContainer.appendChild(btn);
+        });
+    });
+}
+
+function checkAnswer(qIdx, oIdx) {
+    const selectedOption = quizData[qIdx].options[oIdx];
+    const resultBox = document.getElementById(`result-${qIdx}`);
+    resultBox.style.display = 'block';
+    resultBox.className = 'result-box ' + (selectedOption.isCorrect ? 'correct' : 'incorrect');
+    resultBox.innerText = selectedOption.rationale[currentLang];
+}
+
+function switchLanguage(lang, event) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderQuiz();
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
